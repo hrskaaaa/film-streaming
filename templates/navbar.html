@@ -1,0 +1,43 @@
+{% load static %}
+
+<div class="upper-content__right__upper">
+  <div class="upper-content__right__upper__categories">
+    <ul>
+      <li><a href="#">Movies</a></li>
+      <li><a href="#">TV Shows</a></li>
+      <li><a href="#">Anime</a></li>
+    </ul>
+  </div>
+  <div class="search-container">
+    <input
+      type="search"
+      name=""
+      id="search"
+      placeholder="Search..."
+      autocomplete="off"
+      close
+    />
+    <div class="search-icons">
+      <i class="fa fa-search"></i>
+      <i class="fa fa-close" id="close"></i>
+    </div>
+    <div class="search-div"></div>
+  </div>
+
+  <!-- <div class="d-flex align-items-center gap-3">
+    {% if user.is_authenticated %}
+
+    <a href=" {% url 'profile' %}" class="btn btn-outline-light">
+      <i class="fa fa-user me-2"></i>{{ user.username }}
+    </a>
+    {% else %}
+    <button
+      class="btn btn-outline-light"
+      data-bs-toggle="modal"
+      data-bs-target="#authModal"
+    >
+      <i class="fa fa-user me-2"></i>Login
+    </button>
+    {% endif %}
+  </div> -->
+</div>
