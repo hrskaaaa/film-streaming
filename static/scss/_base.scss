@@ -1,15 +1,38 @@
+// navbar nnd
 .upper-content {
-  max-width: 1440px;
-  padding: 0 70px;
+  width: 100%;
+  padding: 0 50px;
   margin: 0 auto;
   display: flex;
   height: 1000px;
-  gap: 70px; //droebit
+
 
   &__left {
     display: flex;
     flex-direction: column;
-    padding: 64px 32px;
+    padding: 32px 32px;
+
+    .logo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 10px;
+      width: auto;
+      height: 100px;
+      margin-bottom: 31px;
+
+      p {
+        color: #f8b319;
+        padding-top: 6px;
+        font-size: 28px;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; // Додає "..." якщо текст не вміщується
+      }
+
+    }
 
     h3 {
       color: #f9f9f9ab;
@@ -33,24 +56,7 @@
       }
     }
 
-    .logo {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 31px;
-      display: flex;
-      align-items: top;
-      justify-content: space-between;
 
-      p {
-        color: #f8b319;
-        font-size: 28px;
-        font-weight: bold;
-        text-transform: uppercase;
-
-
-      }
-
-    }
 
     nav {
       margin-bottom: 59px;
@@ -69,17 +75,17 @@
     display: flex;
     flex-direction: column;
     gap: 55px;
-    padding: 64px 32px;
+    padding: 32px 32px;
 
     &__upper {
       display: flex;
-      gap: 100px;
+      gap: 70px;
       height: 75px;
       align-items: center;
 
       &__categories ul {
         display: flex;
-        gap: 50px;
+        gap: 70px;
 
         li a {
           font-size: 24px;
@@ -93,8 +99,8 @@
 
         #search {
           border: none;
-          width: 315px;
-          height: 56px;
+          width: 360px;
+          height: 50px;
           border-radius: 10px;
           background-color: #21242d;
           font-size: 18px;
@@ -104,7 +110,7 @@
 
           &::placeholder {
             color: #f9f9f9;
-            margin-left: 20px;
+
           }
         }
 
@@ -115,15 +121,27 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          width: 300px;
+          width: 350px;
 
           i {
-            margin-left: 10px;
+            margin-left: 16px;
             cursor: pointer;
             color: #f9f9f9;
           }
         }
       }
+
+      .btn-custom {
+        // width: 100px;
+        padding: 12px 32px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: 6px;
+      }
+
+
     }
 
     .movie-carousel {
@@ -215,7 +233,7 @@
 }
 
 .bottom-content {
-  max-width: 1440px;
+  width: 100%;
   padding: 0 70px;
   margin: 0 auto 50 auto;
 
@@ -243,7 +261,7 @@ footer {
 }
 
 .topMovies {
-  max-width: 1440px;
+  width: 100%;
   margin: 0 auto;
 
   .back {
@@ -287,7 +305,7 @@ footer {
 }
 
 .moviePage {
-  max-width: 1440px;
+  width: 100%;
   background-image: url("../images/lokibg.png");
   background-repeat: no-repeat;
   margin: auto;
