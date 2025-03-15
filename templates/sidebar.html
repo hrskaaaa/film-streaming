@@ -2,42 +2,12 @@
 
 <div class="upper-content__left">
   <div class="logo">
-    <a href="#">
+    <a href="{% url 'home' %}">
       <img src="{% static 'images/Logo.png' %}" alt="Logo" height="75px" />
     </a>
-    <a href="#"><p class="logo-text">Popcorn+</p></a>
+    <a href="{% url 'home' %}"><p class="logo-text">Popcorn+</p></a>
   </div>
-  <div class="menu">
-    <nav>
-      <h3>Menu</h3>
-      <ul>
-        <li>
-          <a href="#">
-            <i class="fa fa-home"></i>
-            Home
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fa fa-search"></i>
-            Discover
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fa fa-trophy"></i>
-            Awards
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="fa fa-star"></i>
-            Celebrities
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </div>
+
   <div class="library">
     <h3>Library</h3>
     <ul>
