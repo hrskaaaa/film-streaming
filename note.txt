@@ -1,0 +1,18 @@
+user: yulia
+email: yuliahrska07@gmail.com
+password: yuliaprotsidym123
+
+token TMDB
+eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0NTFkMmNiYWQyODNhYTM1YmFiMDI0NzFkOGYwNWEzMCIsIm5iZiI6MTc0MTM2OTcwOC4xMTMsInN1YiI6IjY3Y2IzMTZjOWVmMGFjZGI4YjViODE0OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ewLw3ZBm7GYsCtLwm-wHC128Z07PruqRC64qlDq8XHQ
+Key: 451d2cbad283aa35bab02471d8f05a30
+
+
+
+!
+коли я буду створювати можливість писати коменти 
+потрібно в модель для коментів додати поле owner 
+зі звязком OneToMAny використовуючи ForeightKey(Profile, null=True, blank=true, on_delete=models.SET_NULL)
+
+!
+коли буду працювати над плейлистами, найкраще додати їх в нову апку і обмежити їх відображення для незареєстрованих рокистувачів через 
+from django.contrib.auth.decorators import login_required, @login_required(login_url='login')
