@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your views here.
 
 
-def loginPage(request):
+def loginUser(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -26,6 +26,9 @@ def loginPage(request):
 
     return render(request, 'users/login_register.html')
 
+def logoutUser(request):
+    logout(request)
+    return redirect('login')
 
 def profile(request):
     return render(request, 'users/user-profile.html')
