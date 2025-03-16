@@ -8,6 +8,7 @@
     <a href="{% url 'home' %}"><p class="logo-text">Popcorn+</p></a>
   </div>
 
+  {% if user.is_authenticated %}
   <div class="library">
     <h3>Library</h3>
     <ul>
@@ -28,6 +29,7 @@
       </li>
     </ul>
   </div>
+  
   <div class="general">
     <h3>General</h3>
     <ul>
@@ -43,4 +45,5 @@
       
     </ul>
   </div>
+  {% endif %}
 </div>
