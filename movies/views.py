@@ -10,10 +10,33 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from itertools import zip_longest
 
+from datetime import date
 
 def home(request):
-    return render(request, 'main.html')
+    # Фільтруємо по роках 2020–2025 і сортуємо по рейтингу
+    popular_items = Content.objects.filter(
+        release_date__year__gte=2020,
+        release_date__year__lte=2025
+    ).order_by('-rating')[:12]
+
+    # Новинки без обмеження, останні по даті релізу
+    recent_items = Content.objects.order_by('-release_date')[:12]
+
+    # Розбиваємо популярні по 4 для каруселі
+    def chunked(iterable, n):
+        return [iterable[i:i + n] for i in range(0, len(iterable), n)]
+
+    popular_chunks = chunked(list(popular_items), 4)
+
+    return render(request, 'home_content.html', {
+        'popular_chunks': popular_chunks,
+        'recent_items': recent_items
+    })
+
+
+
 
 def movies_page(request):
     genres = get_unique_genres('MOVIE')
@@ -43,6 +66,7 @@ def anime_page(request):
     }
     return render(request, 'movies/anime.html', contex)
 
+#parsing films
 def content_detail(request, pk):
     content = get_object_or_404(Content, pk=pk)
     return render(request, 'movies/content_detail.html', {'content': content})
@@ -491,6 +515,8 @@ def search_external_apis(query):
                 })
     
     return results
+
+
 def search_results(request):
     import re
 
@@ -610,25 +636,26 @@ def search_results(request):
                     })
 
                 # Створюємо або оновлюємо контент
+# Створюємо або оновлюємо контент
                 if content_type == 'ANIME':
-                    lookup = Q()
                     if item.get('mal_id'):
-                        lookup |= Q(mal_id=item['mal_id'])
-                    if item.get('imdb_id'):
-                        lookup |= Q(imdb_id=item['imdb_id'])
-                    
-                    if lookup:
                         content, created = Content.objects.update_or_create(
-                            lookup,
+                            mal_id=item['mal_id'],
+                            defaults=content_data
+                        )
+                    elif item.get('imdb_id'):
+                        content, created = Content.objects.update_or_create(
+                            imdb_id=item['imdb_id'],
                             defaults=content_data
                         )
                     else:
-                        continue
+                        continue  # немає ідентифікаторів
                 else:
                     content, created = Content.objects.update_or_create(
                         imdb_id=item['imdb_id'],
                         defaults=content_data
                     )
+
 
                 combined_results.append({
                     'id': content.id,
@@ -656,3 +683,8 @@ def search_results(request):
     }
 
     return render(request, 'search-results.html', context)
+
+
+
+
+
