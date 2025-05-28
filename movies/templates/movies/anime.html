@@ -1,0 +1,92 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+<div class="content-container">
+  <h2 class="page-header">Anime</h2>
+  <!-- Search and Filter Section -->
+  <div class="filter-section mb-4 p-3 bg-dark rounded">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-4 mb-2">
+            <select id="genre-filter" class="form-select">
+              <option value="">All Genres</option>
+              {% for genre in genres %}
+              <option value="{{ genre }}">{{ genre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <select id="status-filter" class="form-select">
+              <option value="">All Statuses</option>
+              {% for status in statuses %}
+              <option value="{{ status }}">{{ status }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <select id="rating-filter" class="form-select">
+              <option value="">All Ratings</option>
+              <option value="top">Top rated</option>
+              <option value="least">Least rated</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anime Grid -->
+  <div id="anime-grid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+    <!-- Anime will be loaded here via JavaScript -->
+  </div>
+
+  <!-- Load More Button -->
+  <div class="text-center mt-4">
+    <button id="load-more" class="btn btn-primary" style="display: none">
+      Load More <i class="bi bi-arrow-down"></i>
+    </button>
+    <div id="loading-spinner" class="spinner-border text-primary my-4" style="display: none"></div>
+  </div>
+</div>
+
+<!-- Anime Details Modal -->
+<div class="modal fade" id="animeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="animeModalTitle">Anime Details</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" id="animeModalBody">
+        <!-- Content will be loaded dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/anime.js' %}"></script>
+
+<style>
+  .anime-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  .anime-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+  .rating-badge,
+  .status-badge {
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  .card-img-top {
+    height: 300px;
+    object-fit: cover;
+  }
+</style>
+{% endblock %}
