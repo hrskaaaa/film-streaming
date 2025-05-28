@@ -1,0 +1,236 @@
+.edit-account {
+    max-width: 1200px;
+    padding: 2rem;
+    color: $text-color;
+    background-color: $secondary-color;
+    border-radius: $border-radius;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .backButton {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: $primary-color;
+        font-size: 1.5rem;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+
+        &:hover {
+            transform: translateX(-5px);
+        }
+    }
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    &__label {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    &__input {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        color: $text-color;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: $border-radius;
+        transition: all 0.3s ease;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        }
+    }
+
+    textarea.edit-form__input {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    input[type="file"].edit-form__input {
+        padding: 0.5rem;
+        background: transparent;
+        border: none;
+    }
+
+    &__avatar-container {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+    }
+
+    &__avatar-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 180px;
+    }
+
+    &__avatar-preview {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid $primary-color;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__avatar-placeholder {
+        font-size: 5rem;
+        color: rgba(255, 255, 255, 0.2);
+    }
+
+    &__remove-btn-container {
+        width: 100%;
+        text-align: center;
+    }
+
+    &__remove-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 107, 107, 0.1);
+        color: #ff6b6b;
+        border-radius: $border-radius;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        width: 100%;
+        justify-content: center;
+
+        &:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+    }
+
+    &__avatar-controls {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding-top: 0.5rem;
+    }
+
+    &__upload-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    &__avatar-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.5rem;
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+        border: 2px dashed $primary-color;
+        border-radius: $border-radius;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        justify-content: center;
+
+        &:hover {
+            background: rgba($primary-color, 0.2);
+        }
+    }
+
+    &__avatar-hint {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    // Hide the original file input and checkbox
+    input[type="file"].edit-form__input,
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    // Custom checkbox styling when checked
+    input[type="checkbox"]:checked+.edit-form__remove-btn {
+        background: rgba(255, 107, 107, 0.2);
+        border: 1px solid #ff6b6b;
+    }
+
+    /* Hide "Currently:" text and file link */
+    .clearable-file-input a,
+    .clearable-file-input br {
+        display: none !important;
+    }
+
+    /* Hide "Clear" label (keep checkbox) */
+    .clearable-file-input label[for$="-clear"] {
+        display: none !important;
+    }
+
+
+
+    &__submit {
+        background-color: $primary-color;
+        color: $secondary-color;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: $border-radius;
+        transition: all 0.3s ease;
+        width: 100%;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .edit-account {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .edit-form {
+        gap: 1rem;
+
+        &__group {
+            gap: 1rem;
+        }
+    }
+}
