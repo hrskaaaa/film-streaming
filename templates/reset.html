@@ -1,0 +1,39 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+<div class="reset-password">
+  <h3 class="reset-title">Enter new password</h3>
+  <p class="reset-instructions">
+    Please enter your new password twice so we can verify you typed it in correctly.
+  </p>
+  <form class="edit-form" method="post">
+    {% csrf_token %}
+
+    <div class="form-fields">
+      {{ form.new_password1.errors }}
+      <label for="id_new_password1">New password:</label>
+      <input
+        type="password"
+        name="new_password1"
+        id="id_new_password1"
+        class="reset-input"
+        required
+        placeholder="Enter new password"
+      />
+    </div>
+
+    <div class="form-fields">
+      {{ form.new_password2.errors }}
+      <label for="id_new_password2">Confirm password:</label>
+      <input
+        type="password"
+        name="new_password2"
+        id="id_new_password2"
+        class="reset-input"
+        required
+        placeholder="Confirm new password"
+      />
+    </div>
+
+    <input class="edit-form__submit" type="submit" value="Reset Password" />
+  </form>
+</div>
+{% endblock content %}
