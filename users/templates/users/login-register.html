@@ -1,0 +1,108 @@
+<!-- prettier-ignore -->
+{% load static %}
+
+<div class="auth-modal">
+  <button class="auth-modal__close">&times;</button>
+  {% if page == 'register' %}
+  <div class="auth-modal__content">
+    <div class="auth-modal__header">
+      <h1>Join Popcorn+</h1>
+      <p>Create a new user account</p>
+    </div>
+
+    <form class="auth-form" method="POST" action="{% url 'register' %}">
+      {% csrf_token %} {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %} {% for field in form %}
+      <div class="auth-form__field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }} {% if field.errors %}
+        <div class="text-danger">
+          {% for error in field.errors %}
+          <small>{{ error }}</small><br />
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <input class="auth-form__submit" type="submit" value="Register" />
+    </form>
+
+    <div class="auth-modal__footer">
+      <p>Already have an account?</p>
+      <a href="{% url 'login' %}">Log In</a>
+    </div>
+  </div>
+
+  {% else %}
+
+  <div class="auth-modal__content">
+    <div class="auth-modal__header">
+      <h1>Welcome Back</h1>
+      <p>Continue your streaming journey</p>
+    </div>
+
+    <form class="auth-form" action="{% url 'login' %}" method="POST">
+      {% csrf_token %} {% if form.non_field_errors %}
+      <div class="auth-form__errors">
+        {% for error in form.non_field_errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="auth-form__field">
+        <label for="username">Username</label>
+        <input
+          class="auth-form__input {% if form.username.errors %}is-invalid{% endif %}"
+          id="username"
+          type="text"
+          name="username"
+          placeholder="Enter your username..."
+          value="{{ form.username.value|default:'' }}"
+        />
+        {% if form.username.errors %}
+        <div class="auth-form__error">
+          {% for error in form.username.errors %}
+          <small>{{ error }}</small>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="auth-form__field">
+        <label for="password">Password</label>
+        <input
+          class="auth-form__input {% if form.password.errors %}is-invalid{% endif %}"
+          id="password"
+          type="password"
+          name="password"
+          placeholder="••••••••"
+        />
+        {% if form.password.errors %}
+        <div class="auth-form__error">
+          {% for error in form.password.errors %}
+          <small>{{ error }}</small>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="auth-form__actions">
+        <input class="auth-form__submit" type="submit" value="Log In" />
+        <a class="auth-form__link" href="{% url 'reset_password' %}">Forgot Password?</a>
+      </div>
+    </form>
+
+    <div class="auth-modal__footer">
+      <p>Don't have an account?</p>
+      <a href="{% url 'register' %}">Sign Up</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
