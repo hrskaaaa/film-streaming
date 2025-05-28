@@ -1,0 +1,80 @@
+{% extends 'main.html' %} {% block content%}
+
+<div class="profile-page">
+  <!-- Profile Header Section -->
+  <section class="profile-header">
+    <div class="avatar-edit-container">
+      <div class="avatar-wrapper">
+        <img src="{{ profile.profile_image.url }}" alt="Profile picture" class="profile-avatar" />
+        <input type="file" id="avatar-upload" accept="image/*" style="display: none" />
+      </div>
+    </div>
+
+    <div class="profile-info">
+      <h1 class="profile-name">
+        {{ profile.name }}
+        <a href="{% url 'edit-account' %}" class="edit-profile-btn">
+          <i class="bi bi-pencil-fill"></i> Edit
+        </a>
+      </h1>
+      <p class="username">@{{ profile.username }}</p>
+      <p class="member-since">Member since {{ profile.created|date:"d M Y" }}</p>
+    </div>
+  </section>
+
+  <!-- Bio Section -->
+  <section class="bio-section">
+    <h2>About Me</h2>
+    <div class="bio-content">
+      {% if profile.bio %}
+      <p>{{ profile.bio }}</p>
+      {% else %}
+      <p class="empty-bio">
+        You haven't added a bio yet. <a href="{% url 'edit-account' %}">Add one now</a>.
+      </p>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Bottom Section -->
+  <div class="bottom-section">
+    {% if user.is_authenticated %}
+    <a href="{% url 'logout' %}"><i class="fa fa-sign-out"></i> Log Out</a>
+
+    <button
+      type="button"
+      class="btn btn-danger mt-4"
+      data-bs-toggle="modal"
+      data-bs-target="#deleteAccountModal"
+    >
+      Delete Account
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Account Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to permanently delete your account? This action cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form action="{% url 'delete-account' %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
