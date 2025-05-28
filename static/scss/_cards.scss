@@ -1,0 +1,137 @@
+$primary-color: #ffd700;
+$secondary-color: #221f1f;
+$text-color: #ffffff;
+$light-gray: #f5f5f5;
+$dark-gray: #333333;
+$border-radius: 8px;
+
+
+.card-container {
+    &.card {
+        border-radius: $border-radius;
+        overflow: hidden;
+        transition: all 0.2s ease;
+        height: 100%;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background-color: $secondary-color;
+        color: $text-color;
+
+        &:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            background-color: $dark-gray;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .fa-3x {
+                color: $light-gray;
+            }
+        }
+
+        .card-body {
+            padding: 1rem;
+
+            .card-title {
+                font-size: 0.9rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                color: $text-color;
+            }
+
+            .badge {
+                font-size: 0.7rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                padding: 0.25rem 0.5rem;
+                color: $secondary-color;
+
+                &.bg-primary {
+                    background-color: $primary-color !important;
+                }
+
+                &.bg-info {
+                    background-color: lighten($primary-color, 15%) !important;
+                }
+
+                &.bg-danger {
+                    background-color: darken($primary-color, 15%) !important;
+                }
+            }
+
+            .text-muted {
+                font-size: 0.75rem;
+                color: $light-gray !important;
+            }
+
+            .fa-star {
+                color: $primary-color;
+            }
+        }
+
+        // Update your existing button styles or add these if they don't exist
+        .btn-outline-primary {
+            color: $primary-color;
+            border-color: $primary-color;
+            background-color: transparent;
+
+            &:hover,
+            &:focus,
+            &:active {
+                color: $secondary-color;
+                background-color: $primary-color;
+                border-color: $primary-color;
+            }
+
+            // For the specific button in cards
+            &.view-details {
+                font-size: 0.75rem;
+                padding: 0.375rem 0.75rem; // Slightly more padding than your original
+                border-width: 1px;
+                border-radius: $border-radius;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                }
+            }
+        }
+    }
+}
+
+// Responsive grid for all card containers
+.content-grid {
+    .col-card {
+        padding-bottom: 1rem;
+
+        @media (min-width: 576px) {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        @media (min-width: 768px) {
+            flex: 0 0 33.333%;
+            max-width: 33.333%;
+        }
+
+        @media (min-width: 992px) {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        @media (min-width: 1200px) {
+            flex: 0 0 20%;
+            max-width: 20%;
+        }
+    }
+}
