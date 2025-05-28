@@ -1,7 +1,82 @@
-{% extends 'main.html' %} {% block content %} {% include 'movies/filters.html'%}
-<div class="movie-container mt-4">
-  <div id="movie-container" class="row">
-    <!-- Фільми будуть додаватися тут -->
+{% extends 'main.html' %} {% load static %}{% block content %}
+<div class="content-container">
+  <h2 class="page-header">Tv Shows</h2>
+  <!-- Search and Filter Section -->
+  <div class="filter-section mb-4 p-3 bg-dark rounded">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-4 mb-2">
+            <select id="genre-filter" class="form-select">
+              <option value="">All Genres</option>
+              {% for genre in genres %}
+              <option value="{{ genre }}">{{ genre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <select id="year-filter" class="form-select">
+              <option value="">All Years</option>
+              <option value="2020-2024">2020-2025</option>
+              <option value="2010-2020">2010-2020</option>
+              <option value="2000-2010">2000-2010</option>
+              <option value="1990-2000">1990-2000</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <select id="rating-filter" class="form-select">
+              <option value="">All Ratings</option>
+              <option value="top">Top rated</option>
+              <option value="least">Least rated</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TV Shows Grid -->
+  <div id="tvshows-grid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+    <!-- TV shows will be loaded here via JavaScript -->
+  </div>
+
+  <!-- Load More Button -->
+  <div class="text-center mt-4">
+    <button id="load-more" class="btn btn-primary" style="display: none">
+      Load More <i class="bi bi-arrow-down"></i>
+    </button>
+    <div id="loading-spinner" class="spinner-border text-primary my-4" style="display: none"></div>
+  </div>
+  <button
+    id="go-to-top"
+    class="btn btn-outline-light btn-sm"
+    style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000"
+  >
+    <i class="bi bi-arrow-up"></i> Go to Top
+  </button>
+</div>
+
+<!-- TV Show Details Modal -->
+<div class="modal fade" id="tvshowModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="tvshowModalTitle">TV Show Details</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" id="tvshowModalBody">
+        <!-- Content will be loaded dynamically -->
+      </div>
+    </div>
   </div>
 </div>
-{% endblock content %}
+
+<script src="{% static 'js/tvshows.js' %}"></script>
+
+<style></style>
+{% endblock %}
