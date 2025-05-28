@@ -1,0 +1,45 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+<div class="content-detail-page">
+  <div class="detail-header">
+    <div class="poster-wrapper">
+      <img src="{{ content.poster_url }}" alt="{{ content.title }}" />
+    </div>
+
+    <div class="info-wrapper">
+      <h1>{{ content.title }}</h1>
+
+      <ul class="meta-info">
+        {% if content.get_type_display %}
+        <li><strong>Type:</strong> {{ content.get_type_display }}</li>
+        {% endif %} {% if content.release_date %}
+        <li><strong>Year:</strong> {{ content.release_date.year }}</li>
+        {% endif %} {% if content.rating %}
+        <li>
+          <strong>Rating:</strong> <i class="bi bi-star-fill text-warning"></i> {{ content.rating }}
+        </li>
+        {% endif %} {% if content.genres %}
+        <li><strong>Genres:</strong> {{ content.genres|join:", " }}</li>
+        {% endif %} {% if content.director %}
+        <li><strong>Director:</strong> {{ content.director }}</li>
+        {% endif %} {% if content.actors %}
+        <li><strong>Cast:</strong> {{ content.actors|join:", " }}</li>
+        {% endif %} {% if content.studios %}
+        <li><strong>Studios:</strong> {{ content.studios|join:", " }}</li>
+        {% endif %} {% if content.episodes %}
+        <li><strong>Episodes:</strong> {{ content.episodes }}</li>
+        {% endif %} {% if content.status %}
+        <li><strong>Status:</strong> {{ content.status }}</li>
+        {% endif %} {% if content.description %}
+        <li><strong>Description:</strong> {{ content.description }}</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="video-section">
+    <h3>Watch</h3>
+    <div class="video-placeholder">Video player coming soon...</div>
+  </div>
+</div>
+
+{% endblock %}
