@@ -1,0 +1,102 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Search Results for "{{ query }}"</h1>
+
+  {% if not combined_results %}
+  <div class="text-center py-5">
+    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+    <h3 class="mb-2">No results found for "{{ query }}"</h3>
+    <p class="text-muted">Try different keywords or check the spelling</p>
+  </div>
+  {% else %}
+  <div class="row">
+    {% for item in combined_results %}
+
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4">
+      <div class="card-container card h-100 hover-shadow">
+        <!-- Poster Image -->
+        {% if item.poster_url %}
+        <img
+          src="{{ item.poster_url }}"
+          alt="{{ item.title }} poster"
+          class="card-img-top img-fluid"
+          style="height: 200px; object-fit: cover"
+        />
+        {% else %}
+        <div
+          class="card-img-top bg-light d-flex align-items-center justify-content-center"
+          style="height: 200px"
+        >
+          <i class="fas fa-{{ item.type_icon }} fa-3x text-muted"></i>
+        </div>
+        {% endif %}
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <h6 class="card-title mb-1">{{ item.title|truncatechars:20 }}</h6>
+
+          <!-- Type and Year -->
+          <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
+            <span
+              class="badge bg-{% if item.type == 'Movie' %}primary{% elif item.type == 'TV Show' %}info{% else %}danger{% endif %}"
+            >
+              {{ item.type }}
+            </span>
+            <span>
+              {% if item.year %} {{ item.year }} {% elif item.release_date %} {{
+              item.release_date.year }} {% endif %}
+            </span>
+          </div>
+
+          <!-- Rating and Episodes -->
+          <div class="d-flex justify-content-between small text-muted">
+            {% if item.rating %}
+            <span>
+              <i class="bi bi-star-fill text-warning"></i>
+              {{ item.rating|floatformat:1 }}
+            </span>
+            {% elif item.details and item.details.imdbRating %}
+            <span>
+              <i class="bi bi-star-fill text-warning"></i>
+              {{ item.details.imdbRating }}
+            </span>
+            {% elif item.details and item.details.score %}
+            <span>
+              <i class="bi bi-star-fill text-warning"></i>
+              {{ item.details.score }}
+            </span>
+            {% endif %} {% if item.episodes %}
+            <span>{{ item.episodes }} episodes</span>
+            {% endif %}
+          </div>
+
+          <!-- Action Button -->
+          <div class="mt-2">
+            {% if item.source == 'local' %}
+            <a
+              href="{% url 'content_detail' item.id %}"
+              class="btn btn-sm btn-outline-primary w-100"
+            >
+              View Details
+            </a>
+            {% else %}
+            <a
+              href="{{ item.url }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-sm btn-outline-primary w-100"
+            >
+              {% if item.type == 'Anime' %}View on MAL{% else %}View on IMDb{% endif %}
+              <i class="fas fa-external-link-alt ms-1"></i>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
