@@ -1,0 +1,68 @@
+{% extends 'main.html' %} {% block content %}
+
+<div class="edit-account">
+  <a class="backButton" href="{% url 'account' %}"><i class="bi bi-caret-left-fill"></i></a>
+
+  <form
+    class="edit-form"
+    method="post"
+    action="{% url 'edit-account' %}"
+    enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+
+    <div class="edit-form__group">
+      <!-- Profile Image Section with Flex Layout -->
+      <div class="edit-form__field">
+        <div class="edit-form__avatar-container">
+          <!-- Left Side - Avatar Preview -->
+          <div class="edit-form__avatar-left">
+            <div class="edit-form__avatar-preview">
+              {% if form.profile_image.value %}
+              <img src="{{ form.profile_image.value.url }}" alt="Current profile image" />
+              {% else %}
+              <div class="edit-form__avatar-placeholder">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Right Side - Upload Controls -->
+          <div class="edit-form__avatar-controls">
+            <div class="edit-form__upload-section">
+              <label
+                class="edit-form__avatar-upload-btn"
+                for="{{ form.profile_image.id_for_label }}"
+              >
+                <i class="bi bi-upload"></i> Upload New Image
+              </label>
+              <div style="display: none">{{ form.profile_image }}</div>
+              <div class="edit-form__avatar-hint">JPG or PNG, 500×500px minimum</div>
+              {% if form.profile_image.value %}
+              <div class="edit-form__remove-btn-container">
+                <input type="checkbox" name="profile_image-clear" id="profile_image-clear_id" />
+                <label for="profile_image-clear_id" class="edit-form__remove-btn">
+                  <i class="bi bi-trash"></i> Remove Image
+                </label>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular fields (excluding profile_image) -->
+      {% for field in form %} {% if field.name != 'profile_image' %}
+      <div class="edit-form__field">
+        <label class="edit-form__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endif %} {% endfor %}
+    </div>
+
+    <input class="edit-form__submit" type="submit" value="Save Changes" />
+  </form>
+</div>
+
+{% endblock content %}
