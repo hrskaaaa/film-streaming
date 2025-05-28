@@ -17,69 +17,25 @@ a {
   color: white;
 }
 
+ol,
+ul {
+  padding-left: 0;
+}
+
 body {
   background-color: black;
   color: white;
   width: 100%;
   font-family: "Lato", sans-serif;
-  background-image: url("../images/mainbg.png");
-  background-repeat: no-repeat;
+
 }
 
-.movie-card {
-  width: 240px;
-  height: 300px;
-  background: url("../images//loki.png");
-  padding: 10px;
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
 
-  h2 {
-    font-size: 24px;
-    line-height: 24px;
-    font-weight: 800;
-    margin: 15px 0 0 15px;
-  }
-
-  .rating {
-    display: flex;
-    margin-left: 15px;
-    margin-top: 5px;
-
-    i {
-      color: rgba(248, 179, 25, 1);
-    }
-  }
-
-  .episode {
-    display: flex;
-    margin-top: 127px;
-    font-size: 18px;
-    line-height: 18px;
-    font-weight: 400;
-    color: #f9f9f9b2;
-    justify-content: space-between;
-  }
-
-  .buttons {
-    display: flex;
-    gap: 10px;
-
-    .plus {
-      width: 57px;
-      height: 57px;
-      background-color: rgba(249, 249, 249, 0.2);
-      border-radius: 15px;
-      border: none;
-    }
-
-    .info {
-      width: 150px;
-      height: 57px;
-      color: black;
-      font-size: 18px;
-      font-weight: 700;
-      border: none;
-      border-radius: 15px;
-      background-color: rgba(248, 179, 25, 1);
-    }
+  @media (max-width: 768px) {
+    padding: 0 20px;
   }
 }
