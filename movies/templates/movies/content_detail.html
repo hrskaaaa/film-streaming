@@ -3,11 +3,25 @@
   <div class="detail-header">
     <div class="poster-wrapper">
       <img src="{{ content.poster_url }}" alt="{{ content.title }}" />
+
+      {% if user.is_authenticated %}
+      <div class="rating-section">
+        <form method="post">
+          {% csrf_token %}
+          <div class="star-rating">
+            {% for i in "54321" %}
+            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" />
+            <label for="star{{ i }}" title="{{ i }} stars">★</label>
+            {% endfor %}
+          </div>
+          <button type="submit" class="submit-rating-btn">Rate</button>
+        </form>
+      </div>
+      {% endif %}
     </div>
 
     <div class="info-wrapper">
       <h1>{{ content.title }}</h1>
-
       <ul class="meta-info">
         {% if content.get_type_display %}
         <li><strong>Type:</strong> {{ content.get_type_display }}</li>
@@ -37,9 +51,192 @@
   </div>
 
   <div class="video-section">
-    <h3>Watch</h3>
-    <div class="video-placeholder">Video player coming soon...</div>
+    <div class="video-header d-flex justify-content-between align-items-center mb-3">
+      <h3>Watch Online</h3>
+      <button
+        id="refresh-sources-btn"
+        class="btn btn-sm btn-outline-secondary"
+        onclick="refreshVideoSources()"
+      >
+        <i class="bi bi-arrow-clockwise"></i> Refresh Sources
+      </button>
+    </div>
+
+    {% if video_sources %}
+    <div class="quality-selection mb-3">
+      <label for="quality-select" class="form-label"><strong>Source:</strong></label>
+      <select id="quality-select" class="form-select" onchange="changeQuality(this)">
+        {% for source in video_sources %}
+        <option
+          value="{{ source.id }}"
+          data-url="{{ source.source_url }}"
+          {%
+          if
+          forloop.first
+          %}selected{%
+          endif
+          %}
+        >
+          {{ source.voice_name }} ({{ source.quality|default:"Unknown" }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="video-player-container">
+      <div id="video-loading" class="text-center py-4" style="display: none">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading video...</p>
+      </div>
+
+      <div id="video-container">
+        <video id="main-video-player" controls width="100%" height="400"></video>
+      </div>
+
+      <div id="video-error" class="alert alert-warning mt-3" style="display: none">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>Error loading video:</strong>
+        <span id="error-message"></span>
+      </div>
+    </div>
+    {% else %}
+    <div class="no-video-sources text-center py-5">
+      <i class="bi bi-film display-1 text-muted"></i>
+      <h5 class="mt-3 text-muted">No video sources found</h5>
+      <button class="btn btn-primary" onclick="refreshVideoSources()">
+        <i class="bi bi-search"></i> Search for Sources
+      </button>
+    </div>
+    {% endif %}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+  let videoPlayer = document.getElementById("main-video-player");
+  let currentSourceId = null;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const firstSource = document.querySelector("#quality-select option");
+    if (firstSource) {
+      currentSourceId = firstSource.value;
+      loadVideo(currentSourceId);
+    }
+  });
+
+  async function loadVideo(sourceId) {
+    const loading = document.getElementById("video-loading");
+    const errorBox = document.getElementById("video-error");
+
+    loading.style.display = "block";
+    errorBox.style.display = "none";
+
+    try {
+      const response = await fetch(`/api/get_streaming_url/${sourceId}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCSRFToken(),
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (window.hls) {
+          window.hls.destroy();
+          window.hls = null;
+        }
+
+        if (Hls.isSupported()) {
+          window.hls = new Hls();
+          window.hls.loadSource(data.streaming_url);
+          window.hls.attachMedia(videoPlayer);
+        } else if (videoPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+          videoPlayer.src = data.streaming_url;
+        } else {
+          throw new Error("This browser does not support HLS playback.");
+        }
+
+        currentSourceId = sourceId;
+      } else {
+        throw new Error(data.error || "Failed to load video");
+      }
+    } catch (error) {
+      console.error("Error loading video:", error);
+      errorBox.style.display = "block";
+      document.getElementById("error-message").textContent = error.message;
+    } finally {
+      loading.style.display = "none";
+    }
+  }
+
+  function changeQuality(select) {
+    const sourceId = select.value;
+    if (sourceId !== currentSourceId) {
+      loadVideo(sourceId);
+    }
+  }
+
+  async function refreshVideoSources() {
+    const btn = document.getElementById("refresh-sources-btn");
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Refreshing...';
+
+    try {
+      const contentId = Number("{{ content.id }}");
+      const response = await fetch(`/api/refresh_video_sources/${contentId}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCSRFToken(),
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        location.reload();
+      } else {
+        alert("Error: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error refreshing sources:", error);
+      alert("Error refreshing sources");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+
+  function getCSRFToken() {
+    const cookieValue = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("csrftoken="))
+      ?.split("=")[1];
+    return cookieValue || "";
+  }
+</script>
+
+<style>
+  .video-player-container {
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  #main-video-player {
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+  }
+
+  .quality-selection {
+    max-width: 400px;
+  }
+</style>
 {% endblock %}

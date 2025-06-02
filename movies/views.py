@@ -1,27 +1,35 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Content
-import requests
-import json
 from django.conf import settings
-from datetime import datetime
-from .omdb_helpers import fetch_omdb_details
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from itertools import zip_longest
+# Local imports
+from .models import Content, Rating, VideoSource
+from .omdb_helpers import fetch_omdb_details
+from movies.utils.kino_ua_parser import KinoUAParser
+from movies.gnn.recommend import get_recommendations
 
-from datetime import date
+# Standard library imports
+import requests
+import json
+import logging
+from datetime import datetime
+
+# Third-party imports
+from asgiref.sync import async_to_sync
+import asyncio
+
 
 def home(request):
-    # Фільтруємо по роках 2020–2025 і сортуємо по рейтингу
+    # Популярні фільми 
     popular_items = Content.objects.filter(
         release_date__year__gte=2020,
         release_date__year__lte=2025
     ).order_by('-rating')[:12]
 
-    # Новинки без обмеження, останні по даті релізу
+    # Новинки 
     recent_items = Content.objects.order_by('-release_date')[:12]
 
     # Розбиваємо популярні по 4 для каруселі
@@ -30,13 +38,39 @@ def home(request):
 
     popular_chunks = chunked(list(popular_items), 4)
 
+    recommended_items = []
+    if request.user.is_authenticated:
+        try:
+            recommended_movie_ids = get_recommendations(request.user.id, top_k=8)
+            recommended_items = Content.objects.filter(id__in=recommended_movie_ids)
+        except Exception:
+            recommended_items = []
+
     return render(request, 'home_content.html', {
         'popular_chunks': popular_chunks,
         'recent_items': recent_items
+        # 'recommended_items': recommended_items
     })
 
+def api_recommendations(request):
+    user_id = request.user.id if request.user.is_authenticated else None
+    if not user_id:
+        return JsonResponse({'results': []})
 
-
+    try:
+        recommended_movie_ids = get_recommendations(user_id, top_k=10)
+        contents = Content.objects.filter(id__in=recommended_movie_ids)
+        data = [{
+            'id': c.id,
+            'title': c.title,
+            'poster_url': c.poster_url,
+            'release_date': c.release_date,
+            'type': c.get_type_display()
+        } for c in contents]
+        return JsonResponse({'results': data})
+    except Exception as e:
+        return JsonResponse({'results': [], 'error': str(e)}, status=500)
+    
 
 def movies_page(request):
     genres = get_unique_genres('MOVIE')
@@ -66,12 +100,152 @@ def anime_page(request):
     }
     return render(request, 'movies/anime.html', contex)
 
-#parsing films
 def content_detail(request, pk):
     content = get_object_or_404(Content, pk=pk)
-    return render(request, 'movies/content_detail.html', {'content': content})
+    
+    # Handle user rating
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating_obj = Rating.objects.filter(user=request.user, content=content).first()
+        if user_rating_obj:
+            user_rating = user_rating_obj.rating
 
-# API endpoints for fetching content
+        if request.method == 'POST':
+            new_rating = request.POST.get('rating')
+            if new_rating and new_rating.isdigit():
+                new_rating = int(new_rating)
+                if 1 <= new_rating <= 5:
+                    if user_rating_obj:
+                        user_rating_obj.rating = new_rating
+                        user_rating_obj.save()
+                    else:
+                        Rating.objects.create(
+                            user=request.user, 
+                            content=content, 
+                            rating=new_rating
+                        )
+                    return redirect('content_detail', pk=pk)
+
+    # If no video sources exist, try to find them
+    if not content.video_sources.exists():
+        parser = KinoUAParser()
+        search_results = async_to_sync(parser.search_content)(content.title)
+        
+        if search_results:
+            # Take the first result (best match)
+            best_match = search_results[0]
+            video_data = async_to_sync(parser.get_video_links)(best_match['url'])
+            
+            if video_data['success']:
+                for source in video_data['video_sources']:
+                    VideoSource.objects.create(
+                        content=content,
+                        source_url=source['url'],
+                        voice_name=source.get('voice_name', 'Original'),
+                        data_id=source.get('data_id', ''),
+                        is_active=True
+                    )
+    
+    context = {
+        'content': content,
+        'user_rating': user_rating,
+        'video_sources': content.video_sources.all()
+    }
+    
+    return render(request, 'movies/content_detail.html', context)
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def get_streaming_url(request, source_id):
+    logger = logging.getLogger(__name__)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        video_source = get_object_or_404(VideoSource, id=source_id)
+
+        # Використовуємо кешовану URL якщо є
+        if video_source.streaming_url:
+            return JsonResponse({
+                'success': True,
+                'streaming_url': video_source.streaming_url,
+                'voice_name': video_source.voice_name
+            })
+
+        parser = KinoUAParser()
+
+        # 🟡 Виклик асинхронної функції в синхронному view
+        result = async_to_sync(parser.get_video_links)(video_source.source_url)
+
+        if result['success'] and result['video_sources']:
+            video_url = result['video_sources'][0]['url']
+            video_source.streaming_url = video_url
+            video_source.save()
+            return JsonResponse({
+                'success': True,
+                'streaming_url': video_url,
+                'voice_name': video_source.voice_name
+            })
+
+        return JsonResponse({
+            'success': False,
+            'error': result.get('error', 'Не знайдено стрім')
+        }, status=500)
+
+    except Exception as e:
+        logger.error(f"Error getting streaming URL: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@csrf_exempt
+def refresh_video_sources(request, content_id):
+    logger = logging.getLogger(__name__)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        content = get_object_or_404(Content, id=content_id)
+        parser = KinoUAParser()
+
+        # Очистка старих джерел
+        content.video_sources.all().delete()
+
+        # 🟡 Виклик асинхронного пошуку
+        search_results = async_to_sync(parser.search_content)(content.title)
+        sources_added = 0
+
+        if search_results:
+            video_data = async_to_sync(parser.get_video_links)(search_results[0]['url'])
+            if video_data['success']:
+                for source in video_data['video_sources']:
+                    VideoSource.objects.create(
+                        content=content,
+                        source_url=source['url'],
+                        voice_name=source.get('voice_name', 'Original'),
+                        data_id=source.get('data_id', ''),
+                        is_active=True,
+                        quality=source.get('quality', 'Unknown'),
+            )
+                    
+                    sources_added += 1
+
+        return JsonResponse({
+            'success': True,
+            'sources_added': sources_added,
+            'message': f'Added {sources_added} video sources'
+        })
+
+    except Exception as e:
+        logger.error(f"Error refreshing video sources: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+    return asyncio.run(async_handler())
 
 def get_unique_genres(content_type=None):
     if content_type:
@@ -399,7 +573,7 @@ def fetch_omdb_details(imdb_id, api_key):
         data = response.json()
         if data.get('Response') == 'True':
             return {
-                'Plot': data.get('Plot'),  # ✅ замість 'description'
+                'Plot': data.get('Plot'),  
                 'Year': data.get('Year'),
                 'Genre': data.get('Genre'),
                 'Director': data.get('Director'),
@@ -636,7 +810,6 @@ def search_results(request):
                     })
 
                 # Створюємо або оновлюємо контент
-# Створюємо або оновлюємо контент
                 if content_type == 'ANIME':
                     if item.get('mal_id'):
                         content, created = Content.objects.update_or_create(
@@ -685,6 +858,4 @@ def search_results(request):
     return render(request, 'search-results.html', context)
 
 
-
-
-
+# views.py - додати нові функції
