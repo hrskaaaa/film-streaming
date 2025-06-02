@@ -1,3 +1,38 @@
-{% extends 'main.html' %} {% block content%}
-<p>User profile</p>
+{% extends 'main.html' %} {% block content %}
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="avatar-container">
+      <img
+        src="{{ profile.profile_image.url }}"
+        alt="{{ profile.username }}"
+        class="profile-avatar"
+      />
+    </div>
+    <div class="profile-info">
+      <h1 class="profile-name">{{ profile.name }}</h1>
+      <p class="profile-username">@{{ profile.username }}</p>
+      <p class="profile-bio">{{ profile.bio }}</p>
+      <div class="profile-stats">
+        <span>Member since {{ profile.created|date:"M Y" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="playlists-section">
+    <h2>{{ profile.name }}'s Playlists</h2>
+    <div class="playlists-grid">
+      {% for playlist in playlists %}
+      <a href="{% url 'playlist_detail' playlist.id %}" class="playlist-card">
+        <div class="playlist-info">
+          <h3>{{ playlist.title }}</h3>
+          <p>{{ playlist.videos.count }} videos</p>
+        </div>
+      </a>
+      {% empty %}
+      <p class="no-playlists">No playlists yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
 {% endblock content%}
