@@ -1,52 +1,17 @@
 {% extends 'main.html' %} {% load static %} {% block content %}
 
 <div class="container mt-5">
-  <h2 class="mb-4">Рекомендовані</h2>
+  <h2 class="mb-4">Recommendations</h2>
   <div class="text-muted mb-5">
     <em>Рекомендації з'являться пізніше за допомогою інтелектуальної моделі</em>
   </div>
 
   <h2 class="mb-3">Popular movies and TV shows</h2>
   <div id="popularCarousel" class="carousel slide position-relative mb-5" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      {% for group in popular_chunks %}
-      <div class="carousel-item {% if forloop.first %}active{% endif %}">
-        <div class="row">
-          {% for item in group %}
-          <div class="col-md-3">
-            <div class="card-container card h-100 hover-shadow">
-              {% if item.poster_url %}
-              <img
-                src="{{ item.poster_url }}"
-                class="card-img-top"
-                alt="{{ item.title }}"
-                onerror="this.src='/static/images/no-poster.jpg'"
-              />
-              {% else %}
-              <img src="/static/images/no-poster.jpg" class="card-img-top" alt="No poster" />
-              {% endif %}
-              <div class="card-body">
-                <h5 class="card-title">{{ item.title|truncatechars:30 }}</h5>
-                <p class="text-muted small mb-2">
-                  {% if item.release_date %}{{ item.release_date.year }}{% else %}N/A{% endif %} |
-                  {{ item.get_type_display }}
-                </p>
-                <a
-                  href="{% url 'content_detail' item.id %}"
-                  class="btn btn-outline-primary view-details w-100"
-                >
-                  View Details
-                </a>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endfor %}
+    <div class="carousel-inner" id="popular-carousel-inner">
+      <!-- JS will inject carousel items here -->
     </div>
 
-    <!-- Навігаційні кнопки по боках -->
     <button
       class="carousel-control-prev"
       type="button"
@@ -69,39 +34,19 @@
     </button>
   </div>
 
-  <h2 class="mb-3">Новинки</h2>
-  <div class="row content-grid">
-    {% for item in recent_items %}
-    <div class="col-card">
-      <div class="card-container card h-100 hover-shadow">
-        {% if item.poster_url %}
-        <img
-          src="{{ item.poster_url }}"
-          class="card-img-top img-fluid"
-          alt="{{ item.title }}"
-          onerror="this.src='/static/images/no-poster.jpg'"
-        />
-        {% else %}
-        <img src="/static/images/no-poster.jpg" class="card-img-top img-fluid" alt="No poster" />
-        {% endif %}
-        <div class="card-body">
-          <h6 class="card-title mb-1">{{ item.title|truncatechars:20 }}</h6>
-          <p class="text-muted small">
-            {% if item.release_date %} {{ item.release_date.year }} {% else %} N/A
-            <!-- prettier ignore -->
-            {% endif %} | {{ item.get_type_display }}
-          </p>
-          <a
-            href="{% url 'content_detail' item.id %}"
-            class="btn btn-outline-primary view-details w-100"
-          >
-            View Details
-          </a>
-        </div>
+  <h2 class="mb-3">New releases</h2>
+  <div id="recent-container" class="row content-grid"></div>
+  <div id="recent-pagination" class="pagination-container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="results-info">
+        <span id="results-count" class="text-muted">Loading...</span>
       </div>
     </div>
-    {% endfor %}
+    <nav aria-label="Recent pagination">
+      <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
   </div>
 </div>
 
+<script src="{% static 'js/new.js' %}"></script>
 {% endblock %}
